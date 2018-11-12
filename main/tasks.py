@@ -8,3 +8,4 @@ def run_playbook(playbook_source, inventory_source):
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
     return stdout
+#BUAT FUNGSI UNTUK BUAT MODEL HISTORY BARU DARI JOB YANG UDAH KELAR

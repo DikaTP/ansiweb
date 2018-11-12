@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
+
 from rest_framework import response, status
 from rest_framework.decorators import action, api_view
 from rest_framework.parsers import FileUploadParser
@@ -18,49 +20,27 @@ class JobViewSet(viewsets.ModelViewSet):
 	queryset = Job.objects.all()
 	serializer_class = JobSerializer
 
-class InventoryViewSet(viewsets.ModelViewSet):
-	queryset = Inventory.objects.all()
+	@action(detail=True, methods=['post','get'])
+	def execute(self, request, pk=None):
+		job = self.get_object()
+		base_folder = settings.MEDIA_URL
+		pb = '{0}{1}'.format(base_folder, job.playbook.file.name)
+		inv = '{0}{1}'.format(base_folder, job.inventory.file.name)
+		t = run_playbook.delay(pb, 'localhost')
+		return response.Response(t.get(timeout=10))
+
+class CredentialViewSet(viewsets.ModelViewSet):#buat fungsi delete file lama kalo model di delete atau abis update file baru(PUT)
+	queryset = Credential.objects.all()        #CUMAN PERLU CREATE, RETRIEVE, DELETE
+	serializer_class = CredentialSerializer
+
+class InventoryViewSet(viewsets.ModelViewSet): #buat fungsi delete file lama kalo model di delete atau abis update file baru(PUT)
+	queryset = Inventory.objects.all()			#CUMAN PERLU CREATE, RETRIEVE, DELETE
 	serializer_class = InventorySerializer
 
-	@action(
-		detail = True,
-		methods = ['PUT'],
-		parser_classes = [FileUploadParser],)
-
-	def upload(self, request, pk):
-		obj = self.get_object()
-		serializer = self.serializer_class(obj, data=request.data, partial=True)
-
-		if serializer.is_valid():
-			serializer.save()
-			return response.Response(serializer.data, status.HTTP_201_CREATED)
-		return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-
-class PlaybookViewSet(viewsets.ModelViewSet):
-	queryset = Playbook.objects.all()
+class PlaybookViewSet(viewsets.ModelViewSet): #buat fungsi delete file lama kalo model di delete atau abis update file baru(PUT)
+	queryset = Playbook.objects.all()			#CUMAN PERLU CREATE, RETRIEVE, DELETE
 	serializer_class = PlaybookSerializer
-
-	@action(
-		detail = True,
-		methods = ['PUT'],
-		parser_classes = [FileUploadParser],)
-
-	def upload(self, request, pk):
-		obj = self.get_object()
-		serializer = self.serializer_class(obj, data=request.data, partial=True)
-
-		if serializer.is_valid():
-			serializer.save()
-			return response.Response(serializer.data, status.HTTP_201_CREATED)
-		return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
 	queryset = History.objects.all()
 	serializer_class = HistorySerializer
-
-@api_view(['GET'])
-def execute(request):
-	t = run_playbook.delay('upload/playbooks/get_ip.yml', 'localhost')
-	while t.status == 'SUCCESS':
-		return response.Response({'result': t.get()})
-	return response.Response({'result': t.get()})

@@ -9,7 +9,6 @@ from django.contrib.auth.models import (
 	PermissionsMixin
 )
 
-
 class UserManager(BaseUserManager):
 	def create_user(self, username, password, email, active=True, is_staff=False, is_admin=False):
 		if not username:
@@ -84,32 +83,64 @@ class User(AbstractBaseUser):
 	def is_active(self):
 		return self.active
 
+def cred_dir_path(instance, filename):
+	return 'user_{0}/credentials/{1}'.format(instance.owner.username, filename)
+
+def inv_dir_path(instance, filename):
+	return 'user_{0}/inventories/{1}'.format(instance.owner.username, filename)
+
+def pb_dir_path(instance, filename):
+	return 'user_{0}/playbooks/{1}'.format(instance.owner.username, filename)
+
+class Credential(models.Model):
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='credentials', on_delete=models.CASCADE)
+	description = models.TextField()
+	file = models.FileField(upload_to=cred_dir_path, default='settings.MEDIA_ROOT/None/no-file.txt')
+	uploaded_at = models.DateTimeField(auto_now_add=True)
+
+	def __str__(self):
+		return self.file.name
+
+	def __unicode__(self):
+		return self.file.name
+
+class Inventory(models.Model):
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='inventories', on_delete=models.CASCADE)
+	description = models.TextField()
+	file = models.FileField(upload_to=inv_dir_path, default='settings.MEDIA_ROOT/None/no-file.txt')
+	uploaded_at = models.DateTimeField(auto_now_add=True)
+	
+	def __str__(self):
+		return self.description
+
+	def __unicode__(self):
+		return self.file.name
+
+class Playbook(models.Model):
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='playbooks', on_delete=models.CASCADE)
+	description = models.TextField()
+	file = models.FileField(upload_to=pb_dir_path, default='settings.MEDIA_ROOT/None/no-file.txt')
+	uploaded_at = models.DateTimeField(auto_now_add=True)
+
+	def __str__(self):
+		return self.description
+
+	def __unicode__(self):
+		return self.file.name
+
 class Job(models.Model):
-	name = models.CharField(max_length=128)
+	name = models.CharField(max_length=128, unique=True)
 	description = models.TextField()
 	created_at = models.DateTimeField(auto_now_add=True)
-	user_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='jobs', on_delete=models.CASCADE)
-	
+	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='jobs', on_delete=models.CASCADE)
+	playbook = models.ForeignKey(Playbook, related_name='playbook', on_delete=models.CASCADE)
+	inventory = models.ForeignKey(Inventory, related_name='inventory', on_delete=models.CASCADE)
+
 	def __str__(self):
 		return self.name
 
-class Inventory(models.Model):
-	description = models.TextField()
-	path = models.FileField(upload_to='inventories')
-	uploaded_at = models.DateTimeField(auto_now_add=True)
-	user_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='inventories', on_delete=models.CASCADE)
-	
-	def __str__(self):
-		return self.path
-
-class Playbook(models.Model):
-	description = models.TextField()
-	path = models.FileField(upload_to='playbooks')
-	uploaded_at = models.DateTimeField(auto_now_add=True)
-	user_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='playbooks', on_delete=models.CASCADE)
-
-	def __str__(self):
-		return self.path
+	def __unicode__(self):
+		return self.name
 
 class History(models.Model):
 	date = models.DateTimeField(auto_now_add=True)
@@ -118,6 +149,9 @@ class History(models.Model):
 	job_id = models.ForeignKey(Job, on_delete=models.CASCADE)
 
 	def __str__(self):
+		return self.status
+
+	def __unicode__(self):
 		return self.status
 
 	class Meta:

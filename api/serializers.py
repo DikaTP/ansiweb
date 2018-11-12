@@ -27,7 +27,51 @@ class UserSerializer(serializers.ModelSerializer):
 		user.save()
 		return user
 
+class CredentialSerializer(serializers.ModelSerializer):
+
+	file = serializers.FileField(allow_empty_file=False, use_url=False)
+
+	class Meta:
+		model = Inventory
+		fields = (
+			'id',
+			'description', 
+			'file', 
+			'uploaded_at', 
+			'owner',
+			)
+
+class InventorySerializer(serializers.ModelSerializer):
+
+	file = serializers.FileField(allow_empty_file=False, use_url=False)
+
+	class Meta:
+		model = Inventory 
+		fields = (
+			'id',
+			'description', 
+			'file', 
+			'uploaded_at', 
+			'owner',
+			)
+
+class PlaybookSerializer(serializers.ModelSerializer):
+
+	file = serializers.FileField(allow_empty_file=False, use_url=False)
+
+	class Meta:
+		model = Playbook 
+		fields = (
+			'id', 
+			'description', 
+			'file', 
+			'uploaded_at', 
+			'owner',
+			)
+
+
 class JobSerializer(serializers.ModelSerializer):
+
 	class Meta:
 		model = Job
 		fields = (
@@ -35,36 +79,11 @@ class JobSerializer(serializers.ModelSerializer):
 			'name',
 			'description', 
 			'created_at',
-			'user_id', 
+			'owner',
+			'playbook',
+			'inventory'
 			)
 
-class InventorySerializer(serializers.ModelSerializer):
-
-	path = serializers.FileField(allow_empty_file=False, use_url=False)
-
-	class Meta:
-		model = Inventory 
-		fields = (
-			'id',
-			'description', 
-			'path', 
-			'uploaded_at', 
-			'user_id',
-			)
-
-class PlaybookSerializer(serializers.ModelSerializer):
-
-	path = serializers.FileField(allow_empty_file=False, use_url=False)
-
-	class Meta:
-		model = Playbook 
-		fields = (
-			'id', 
-			'description', 
-			'path', 
-			'uploaded_at', 
-			'user_id',
-			)
 
 class HistorySerializer(serializers.ModelSerializer):
 	class Meta:
