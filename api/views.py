@@ -5,15 +5,10 @@ from rest_framework import response, status
 from rest_framework.decorators import action, api_view
 from rest_framework.parsers import FileUploadParser
 from rest_framework import viewsets
-from main.tasks import run_ansible
+from main.tasks import run_playbook
 from django.shortcuts import render
 from main.models import *
 from serializers import *
-from django.contrib.auth.models import User
-
-import json
-# Create your views here.
-
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
@@ -38,9 +33,8 @@ class InventoryViewSet(viewsets.ModelViewSet):
 
 		if serializer.is_valid():
 			serializer.save()
-			return response.Response(serializer.data)
+			return response.Response(serializer.data, status.HTTP_201_CREATED)
 		return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-	
 
 class PlaybookViewSet(viewsets.ModelViewSet):
 	queryset = Playbook.objects.all()
@@ -57,12 +51,16 @@ class PlaybookViewSet(viewsets.ModelViewSet):
 
 		if serializer.is_valid():
 			serializer.save()
-			return response.Response(serializer.data)
+			return response.Response(serializer.data, status.HTTP_201_CREATED)
 		return response.Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET','POST'])
+class HistoryViewSet(viewsets.ReadOnlyModelViewSet):
+	queryset = History.objects.all()
+	serializer_class = HistorySerializer
+
+@api_view(['GET'])
 def execute(request):
-	t = run_ansible.delay('upload/playbooks/get_ip.yml', 'localhost')
+	t = run_playbook.delay('upload/playbooks/get_ip.yml', 'localhost')
 	while t.status == 'SUCCESS':
-		return response.Response({'result': t.get(timeout=7)})
-	return response.Response({'result': t.get(timeout=7)})
+		return response.Response({'result': t.get()})
+	return response.Response({'result': t.get()})

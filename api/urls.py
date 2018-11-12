@@ -8,7 +8,7 @@ router.register('users', UserViewSet)
 router.register('jobs', JobViewSet)
 router.register('inventories', InventoryViewSet)
 router.register('playbooks', PlaybookViewSet)
-
+router.register('histories', HistoryViewSet)
 urlpatterns = [
 	url(r'^run', execute)
 ] + router.urls
