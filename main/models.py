@@ -83,8 +83,8 @@ class User(AbstractBaseUser):
 	def is_active(self):
 		return self.active
 
-def cred_dir_path(instance, filename):
-	return 'user_{0}/credentials/{1}'.format(instance.owner.username, filename)
+# def cred_dir_path(instance, filename):
+# 	return 'user_{0}/credentials/{1}'.format(instance.owner.username, filename)
 
 def inv_dir_path(instance, filename):
 	return 'user_{0}/inventories/{1}'.format(instance.owner.username, filename)
@@ -92,17 +92,17 @@ def inv_dir_path(instance, filename):
 def pb_dir_path(instance, filename):
 	return 'user_{0}/playbooks/{1}'.format(instance.owner.username, filename)
 
-class Credential(models.Model):
-	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='credentials', on_delete=models.CASCADE)
-	description = models.TextField()
-	file = models.FileField(upload_to=cred_dir_path, default='settings.MEDIA_ROOT/None/no-file.txt')
-	uploaded_at = models.DateTimeField(auto_now_add=True)
+# class Credential(models.Model):
+# 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='credentials', on_delete=models.CASCADE)
+# 	description = models.TextField()
+# 	file = models.FileField(upload_to=cred_dir_path, default='settings.MEDIA_ROOT/None/no-file.txt')
+# 	uploaded_at = models.DateTimeField(auto_now_add=True)
 
-	def __str__(self):
-		return self.file.name
+# 	def __str__(self):
+# 		return self.file.name
 
-	def __unicode__(self):
-		return self.file.name
+# 	def __unicode__(self):
+# 		return self.file.name
 
 class Inventory(models.Model):
 	owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='inventories', on_delete=models.CASCADE)
@@ -145,8 +145,8 @@ class Job(models.Model):
 class History(models.Model):
 	date = models.DateTimeField(auto_now_add=True)
 	status = models.CharField(max_length=128)
-	result = models.TextField()
-	job_id = models.ForeignKey(Job, on_delete=models.CASCADE)
+	result = models.TextField(blank=True)
+	job = models.ForeignKey(Job, related_name='job', on_delete=models.CASCADE)
 
 	def __str__(self):
 		return self.status
@@ -156,3 +156,6 @@ class History(models.Model):
 
 	class Meta:
 		ordering = ('date',)
+
+class JobRunning(models.Model):
+	job = models.ForeignKey(Job, on_delete=models.CASCADE)

@@ -10,4 +10,5 @@ router.register('jobs', JobViewSet)
 router.register('inventories', InventoryViewSet)
 router.register('playbooks', PlaybookViewSet)
 router.register('histories', HistoryViewSet)
+router.register('jobrunning', JobRunningViewSet)
 urlpatterns = router.urls

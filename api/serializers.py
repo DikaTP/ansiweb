@@ -27,19 +27,19 @@ class UserSerializer(serializers.ModelSerializer):
 		user.save()
 		return user
 
-class CredentialSerializer(serializers.ModelSerializer):
+# class CredentialSerializer(serializers.ModelSerializer):
 
-	file = serializers.FileField(allow_empty_file=False, use_url=False)
+# 	file = serializers.FileField(allow_empty_file=False, use_url=False)
 
-	class Meta:
-		model = Inventory
-		fields = (
-			'id',
-			'description', 
-			'file', 
-			'uploaded_at', 
-			'owner',
-			)
+# 	class Meta:
+# 		model = Inventory
+# 		fields = (
+# 			'id',
+# 			'description', 
+# 			'file', 
+# 			'uploaded_at', 
+# 			'owner',
+# 			)
 
 class InventorySerializer(serializers.ModelSerializer):
 
@@ -93,5 +93,10 @@ class HistorySerializer(serializers.ModelSerializer):
 			'date',
 			'status',
 			'result',
-			'job_id'
+			'job'
 			)
+
+class JobRunningSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = JobRunning
+		fields = '__all__'
