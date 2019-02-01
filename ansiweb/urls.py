@@ -16,10 +16,15 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.conf import settings
-
+from django.contrib import admin
+from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
-    url(r'^api/v1/', include('api.urls')),
+    url(r'^admin/', admin.site.urls),
+    url(r'^api/v1/', include('api.urls', namespace='api')),
+    url(r'^api-auth/', include('rest_framework.urls')),
+    url(r'^request-token/', obtain_jwt_token)
 ]
-if settings.DEBUG:
-	urlpatterns+=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG == True:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
