@@ -8,7 +8,7 @@ boto3==1.9.30
 botocore==1.12.30
 celery==4.2.1
 cffi==1.11.5
-cryptography==2.3.1
+cryptography==3.2
 Django==1.11.15
 djangorestframework==3.8.2
 djangorestframework-jwt==1.11.0
