@@ -35,5 +35,5 @@ pytz==2018.5
 PyYAML==3.13
 s3transfer==0.1.13
 six==1.11.0
-urllib3==1.24
+urllib3==1.26.5
 vine==1.1.4
