@@ -9,7 +9,7 @@ botocore==1.12.30
 celery==4.2.1
 cffi==1.11.5
 cryptography==2.3.1
-Django==1.11.15
+Django==2.2.24
 djangorestframework==3.8.2
 djangorestframework-jwt==1.11.0
 docutils==0.14
