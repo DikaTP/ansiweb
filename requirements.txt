@@ -6,7 +6,7 @@ billiard==3.5.0.4
 boto==2.49.0
 boto3==1.9.30
 botocore==1.12.30
-celery==4.2.1
+celery==5.2.2
 cffi==1.11.5
 cryptography==2.3.1
 Django==1.11.15
